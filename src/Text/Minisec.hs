@@ -73,12 +73,27 @@ digit = toInteger . digitToInt <$> satisfy isDigit
 number :: Monoid e => Parser Char e Integer
 number = foldl (\a d -> 10 * a + d) <$> pure 0 <*> some digit
 
-chainl :: (Eq s, Monoid e) => Parser s e a -> Parser s e (a -> a -> a)-> Parser s e a
+chainl
+    :: (Eq s, Monoid e)
+    => Parser s e a
+    -> Parser s e (a -> a -> a)
+    -> Parser s e a
 chainl p op = foldl (\a (op, b) -> op a b) <$> p <*> many ((,) <$> op <*> p)
 
-expression :: (Eq s, Monoid e) => [[Parser s e (a -> a -> a)]] -> Parser s e a -> Parser s e a
+expression
+    :: (Eq s, Monoid e)
+    => [[Parser s e (a -> a -> a)]]
+    -> Parser s e a
+    -> Parser s e a
 expression opss atom = foldl (\p ops -> chainl p $ asum ops) atom opss
 
 parens :: Monoid e => Parser Char e a -> Parser Char e a
 parens p = char '(' *> p <* char ')'
+
+infix  0 <?>
+(<?>) :: Monoid e => Parser s e a -> e -> Parser s e a
+p <?> e = Parser $ \s -> case runParser p s of
+    Consumed (Left (e', s')) -> Consumed (Left (e <> e', s'))
+    Empty    (Left (e', s')) -> Empty (Left (e <> e', s'))
+    r                        -> r
 

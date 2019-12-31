@@ -12,7 +12,7 @@ expr :: Parser Char String Integer
 expr = expression
     [ [char '*' $> (*), char '/' $> div]
     , [char '+' $> (+), char '-' $> (-)] ]
-    (number <|> parens expr)
+    (number <|> parens expr <?> "Expected a number or parentheses")
 
 main :: IO ()
 main = getLine >>= \s -> print $ runParser expr s
