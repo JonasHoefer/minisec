@@ -1,0 +1,8 @@
+{-# LANGUAGE GeneralizedNewtypeDeriving #-}
+
+module Text.Minisec where
+
+
+data Consumed a = Consumed a | Empty a deriving (Functor)
+
+newtype Parser s e a = { unParser :: [s] -> Either (e, a) ([s], a)
