@@ -1,6 +1,14 @@
 module Main where
 
-import Text.Minisec
+import           Data.Functor
+import           Control.Applicative
+import           Text.Minisec
+
+
+expr :: Parser Char String Integer
+expr = expression
+    [[char '*' $> (*), char '/' $> div], [char '+' $> (+), char '-' $> (-)]]
+    (number <|> parens expr)
 
 main :: IO ()
-main = undefined
+main = getLine >>= \s -> print $ runParser expr s

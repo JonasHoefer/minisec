@@ -11,6 +11,7 @@ import           Control.Monad
 
 
 -- marks wether the parser did or did not consume input
+-- Allows to implement <|> without capturing the current input [s], which gives better cotrol over the memory.
 data Consumed a = Consumed a | Empty a deriving (Show, Functor)
 
 unConsumed :: Consumed a -> a
@@ -76,4 +77,8 @@ chainl :: (Eq s, Monoid e) => Parser s e a -> Parser s e (a -> a -> a)-> Parser 
 chainl p op = foldl (\a (op, b) -> op a b) <$> p <*> many ((,) <$> op <*> p)
 
 expression :: (Eq s, Monoid e) => [[Parser s e (a -> a -> a)]] -> Parser s e a -> Parser s e a
-expression opss atom = foldl (\p ops -> chainl p (asum ops)) atom opss
+expression opss atom = foldl (\p ops -> chainl p $ asum ops) atom opss
+
+parens :: Monoid e => Parser Char e a -> Parser Char e a
+parens p = char '(' *> p <* char ')'
+
