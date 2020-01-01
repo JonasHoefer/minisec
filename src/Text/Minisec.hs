@@ -59,8 +59,8 @@ next = Parser $ \case
 
 eof :: Monoid e => Parser s e ()
 eof = Parser $ \case
-    []       -> Empty (Right ((), []))
-    _        -> Empty (Left (mempty, []))
+    [] -> Empty (Right ((), []))
+    _  -> Empty (Left (mempty, []))
 
 satisfy :: Monoid e => (s -> Bool) -> Parser s e s
 satisfy p = try $ next >>= \x -> if p x then return x else empty
