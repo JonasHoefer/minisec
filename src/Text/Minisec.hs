@@ -2,7 +2,6 @@
 
 module Text.Minisec where
 
-import           Data.Char
 import           Data.Functor
 import           Data.Foldable                  ( asum )
 
@@ -67,12 +66,6 @@ char c = satisfy (== c)
 string :: (Eq s, Monoid e) => [s] -> Parser s e [s]
 string = foldr (\c -> (<*>) ((:) <$> satisfy (== c))) (return [])
 
-digit :: Monoid e => Parser Char e Integer
-digit = toInteger . digitToInt <$> satisfy isDigit
-
-number :: Monoid e => Parser Char e Integer
-number = foldl (\a d -> 10 * a + d) <$> pure 0 <*> some digit
-
 chainl
     :: (Eq s, Monoid e)
     => Parser s e a
@@ -86,9 +79,6 @@ expression
     -> Parser s e a
     -> Parser s e a
 expression opss atom = foldl (\p ops -> chainl p $ asum ops) atom opss
-
-parens :: Monoid e => Parser Char e a -> Parser Char e a
-parens p = char '(' *> p <* char ')'
 
 infix  0 <?>
 (<?>) :: Monoid e => Parser s e a -> e -> Parser s e a

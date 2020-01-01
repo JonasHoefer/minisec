@@ -2,7 +2,9 @@ module Main where
 
 import           Data.Functor
 import           Control.Applicative
+
 import           Text.Minisec
+import           Text.Minisec.String
 
 
 expr :: Parser Char String Integer
